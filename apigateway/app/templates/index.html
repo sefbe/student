@@ -1,0 +1,28 @@
+
+{% extends "base.html" %}
+{% block title %}Accueil{% endblock %}
+
+{% block content %}
+<div class="jumbotron text-center">
+    <h1>Bienvenue sur Student Housing</h1>
+    <p>Trouvez facilement un logement près de votre université !</p>
+</div>
+  <h1>Nos Chambres</h1>
+  <div class="row">
+    {% for room in rooms %}
+      <div class="col-md-4">
+        <div class="card">
+          <img src="{{ room.images[0] }}" class="card-img-top" alt="Image de la chambre">
+          <div class="card-body">
+            <h5 class="card-title">{{ room.title }}</h5>
+            <p class="card-text">Prix: {{ room.price }} FCFA</p>
+            <p class="card-text">Distance: {{ room.distance }} km</p>
+            <a href="{{ url_for('room_bp.room_details', room_id=room.id) }}" class="btn btn-primary">Voir les détails</a>
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+{% endblock %}
+
+
