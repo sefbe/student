@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% block title %}Mes Réservations{% endblock %}
+
+{% block content %}
+    <h1>Mes Réservations</h1>
+
+    {% if reservations %}
+        <table>
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Chambre</th>
+                    <th>Date de réservation</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for reservation in reservations %}
+                    <tr>
+                        <td>{{ loop.index }}</td>
+                        <td>{{ reservation.room_id }}</td>
+                        <td>{{ reservation.reservation_date }}</td>
+                        <td>
+                            <form action="{{ url_for('app_bp.pay_room', room_id=reservation.id) }}" method="post" style="display:inline;">
+                                <button type="submit" class="btn btn-success">Payer</button>
+                            </form>
+                            <form action="{{ url_for('app_bp.cancel', reservation_id=reservation.id) }}" method="post" style="display:inline;">
+                                <button type="submit" class="btn btn-danger">Annuler</button>
+                            </form>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>Vous n'avez aucune réservation.</p>
+    {% endif %}
+{% endblock %}
+
+

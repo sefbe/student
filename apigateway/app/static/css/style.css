@@ -1,0 +1,7 @@
+.header-title {
+    font-family: 'Arial', sans-serif; /* Exemple de police */
+    font-size: 24px; /* Ajustez selon vos besoins */
+    font-weight: bold; /* Peut être 'normal' selon le design */
+    color: #333; /* Couleur sombre pour la lisibilité */
+    text-align: center; /* Centré pour un en-tête */
+}

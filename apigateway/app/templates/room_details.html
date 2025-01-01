@@ -3,26 +3,29 @@
 {% block content %}
   <h1>{{ room.title }}</h1>
   <div>
-    <img src="{{ room.images[0] }}" alt="Image principale" class="img-fluid">
+    <!-- Image principale -->
+    <img src="data:image/jpeg;base64,{{ room.images[0].data }}" alt="Image principale" class="img-fluid">
   </div>
   <p>{{ room.description }}</p>
-  <p>Prix: {{ room.price }} €</p>
+  <p>Prix: {{ room.price }} FCFA</p>
   <p>Distance: {{ room.distance }} km</p>
+  <p>Statut: {{ room.status }} </p>
   
   <h3>Images supplémentaires</h3>
   <div class="row">
     {% for image in room.images[1:] %}
       <div class="col-md-4">
-        <img src="{{ image }}" class="img-fluid" alt="Image supplémentaire">
+        <!-- Images supplémentaires -->
+        <img src="data:image/jpeg;base64,{{ image.data }}" class="img-fluid" alt="Image supplémentaire">
       </div>
     {% endfor %}
   </div>
 
-  <a href="{{ url_for('room_bp.reserve_room', room_id=room.id) }}" class="btn btn-success">Réserver</a>
-  <a href="{{ url_for('room_bp.pay_room', room_id=room.id) }}" class="btn btn-warning">Payer</a>
+  <a href="{{ url_for('app_bp.reserve_room', room_id=room.id) }}" class="btn btn-success">Réserver</a>
+  <a href="{{ url_for('app_bp.pay_room', room_id=room.id) }}" class="btn btn-warning">Payer</a>
 
-  {% if room.owner_id == 1 %}  <!-- Vérifier si l'utilisateur est le propriétaire -->
-    <form method="POST" action="{{ url_for('room_bp.delete_room', room_id=room.id) }}">
+  {% if room.owner_id == current_user.id %}  <!-- Vérifier si l'utilisateur est le propriétaire -->
+    <form method="POST" action="{{ url_for('app_bp.delete_room', room_id=room.id) }}">
       <button type="submit" class="btn btn-danger">Supprimer cette chambre</button>
     </form>
   {% endif %}

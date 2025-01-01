@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+
+{% block title %}Nos Services - Salford & MSNLM Sarl{% endblock %}
+
+{% block content %}
+    <header>
+        <h1>Découvrez nos Services</h1>
+    </header>
+    <main>
+        <section class="services container">
+            <h2 class="text-center">Options de logement</h2>
+            <ul class="mt-4">
+                <li>Chambres meublées avec équipements modernes.</li>
+                <li>Studios étudiants à proximité des universités.</li>
+                <li>Appartements partagés idéaux pour la colocation.</li>
+            </ul>
+        </section>
+        <section class="temoignages container mt-5">
+            <h2 class="text-center">Témoignages</h2>
+            <blockquote class="blockquote text-center mt-4">
+                <p>"J'ai trouvé une chambre parfaite en 2 jours grâce à Salford & MSNLM Sarl."</p>
+                <footer class="blockquote-footer">Marie K.</footer>
+            </blockquote>
+            <blockquote class="blockquote text-center mt-4">
+                <p>"Un service client exceptionnel et des logements de qualité !"</p>
+                <footer class="blockquote-footer">Jean D.</footer>
+            </blockquote>
+        </section>
+        <section class="newsletter container mt-5">
+            <h2 class="text-center">Abonnez-vous à notre newsletter</h2>
+            <form class="mt-4">
+                <input type="email" placeholder="Votre email" class="form-control mb-2">
+                <button type="submit" class="btn btn-secondary">S'abonner</button>
+            </form>
+        </section>
+    </main>
+{% endblock %}

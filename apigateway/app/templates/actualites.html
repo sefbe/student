@@ -1,0 +1,34 @@
+
+{% extends 'base.html' %}
+
+{% block title %}Actualités - Salford & MSNLM Sarl{% endblock %}
+
+{% block content %}
+    <header>
+        <h1>Actualités et Nouvelles</h1>
+    </header>
+    <main>
+        <section class="articles-recents container">
+            <h2 class="text-center">Articles récents</h2>
+            <article class="mt-4">
+                <h3>Nouvelle résidence étudiante à Yaoundé</h3>
+                <img src="../chambres/chambre4/7.jpeg" alt="Nouvelle résidence" class="img-fluid">
+                <p>Découvrez notre nouvelle résidence avec des chambres modernes et bien équipées.</p>
+                <a href="../chambres/chambre4/chambre4.html" class="btn btn-primary">Lire plus</a>
+            </article>
+            <article class="mt-4">
+                <h3>Réduction spéciale pour les étudiants</h3>
+                <img src="../chambres/chambre8/1.jpeg" alt="Réduction spéciale" class="img-fluid">
+                <p>Profitez d'une réduction de 10% sur les réservations avant la fin de l'année.</p>
+                <a href="../chambres/chambre8/chambre8.html" class="btn btn-primary">Lire plus</a>
+            </article>
+        </section>
+        <section class="newsletter container">
+            <h2 class="text-center">Abonnez-vous à notre newsletter</h2>
+            <form class="mt-4">
+                <input type="email" placeholder="Votre email" class="form-control mb-2">
+                <button type="submit" class="btn btn-secondary">S'abonner</button>
+            </form>
+        </section>
+    </main>
+{% endblock %}

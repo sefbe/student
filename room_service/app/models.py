@@ -8,14 +8,16 @@ class Room(db.Model):
     price = db.Column(db.Float, nullable=False)
     location = db.Column(db.String(100), nullable=False)
     distance = db.Column(db.Float, nullable=False)
-    images = db.Column(db.Text, nullable=True)  # Liste des images séparées par des virgules
     owner_id = db.Column(db.Integer, nullable=False)
+    status = db.Column(db.String(20), default='disponible')  # Ajout de l'attribut status
 
-    # Représentation en chaîne de caractères de l'objet
+    # Relation avec les images (relation One-to-Many)
+    images = db.relationship('Image', backref='room', cascade="all, delete-orphan")
+
     def __repr__(self):
-        return f"<Room {self.title} (Owner ID: {self.owner_id})>"
+        return f"<Room {self.title}>"
 
-    # Méthode pour convertir l'objet en dictionnaire, utile pour les API
+    # Méthode pour convertir l'objet Room en dictionnaire
     def to_dict(self):
         return {
             "id": self.id,
@@ -24,21 +26,26 @@ class Room(db.Model):
             "price": self.price,
             "location": self.location,
             "distance": self.distance,
-            "images": self.images.split(',') if self.images else []  # Transformation des images en liste
+            "owner_id": self.owner_id,
+            "status": self.status,  # Inclure le status dans le résultat
+            "images": [image.to_dict() for image in self.images]  # Inclure les images dans le résultat
         }
-    
-    # Méthode pour ajouter une image à la liste d'images
-    def add_image(self, image_path):
-        if self.images:
-            self.images += ',' + image_path
-        else:
-            self.images = image_path
 
-    # Méthode pour supprimer une image de la liste d'images
-    def remove_image(self, image_path):
-        if self.images:
-            images_list = self.images.split(',')
-            if image_path in images_list:
-                images_list.remove(image_path)
-                self.images = ','.join(images_list)
+class Image(db.Model):
+    __tablename__ = 'images'
+    id = db.Column(db.Integer, primary_key=True)
+    room_id = db.Column(db.Integer, db.ForeignKey('rooms.id'), nullable=False)  # Lien avec la chambre
+    image_data = db.Column(db.LargeBinary, nullable=False)  # Contenu binaire de l'image
+    image_name = db.Column(db.String(255), nullable=False)  # Nom de fichier de l'image
 
+    def __repr__(self):
+        return f"<Image {self.image_name}>"
+
+    # Méthode pour convertir l'objet Image en dictionnaire
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "room_id": self.room_id,
+            "image_name": self.image_name,
+            "image_data": None  # Optionnel : exclure les données binaires ou utiliser Base64 pour encoder
+        }

@@ -1,7 +1,7 @@
 from flask_wtf import FlaskForm
+from flask_wtf.file import FileField, FileAllowed, MultipleFileField
 from wtforms import StringField, PasswordField, SubmitField, SelectField, TextAreaField, FloatField, FileField
 from wtforms.validators import DataRequired, Email, EqualTo, Length, Optional
-
 
 class SignupForm(FlaskForm):
     username = StringField('Nom d\'utilisateur', validators=[
@@ -38,11 +38,17 @@ class LoginForm(FlaskForm):
 
 
 
+
+
 class RoomForm(FlaskForm):
     title = StringField('Titre', validators=[DataRequired()])
     description = TextAreaField('Description', validators=[DataRequired()])
     price = FloatField('Prix', validators=[DataRequired()])
     location = StringField('Emplacement', validators=[DataRequired()])
     distance = FloatField('Distance (km)', validators=[DataRequired()])
-    images = StringField('Images (séparées par des virgules)', validators=[Optional()])
+    images = MultipleFileField(
+        'Télécharger des images',
+        validators=[FileAllowed(['jpg', 'png'], 'Seules les images JPG et PNG sont autorisées'), DataRequired(message="Veuillez télécharger au moins une image.")],
+        render_kw={'multiple': True}
+    )
     submit = SubmitField('Ajouter la chambre')
