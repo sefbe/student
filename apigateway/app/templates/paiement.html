@@ -1,0 +1,41 @@
+
+{% extends 'base.html' %}
+
+{% block title %}Paiement{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="static/css/style2.css">
+    <div class="container">
+        <header>
+            <h1>Bienvenue sur le système de paiement</h1>
+        </header>
+        <main class="payment-options">
+            <div class="payment-option">
+                <img src="static/images/logo_mtn.png" alt="MTN Logo">
+                <a href="mtn.html">MTN Mobile Money</a>
+            </div>
+            <div class="payment-option">
+                <img src="static/images/logo_orange.png" alt="Orange Logo">
+                <a href="orange.html">Orange Money</a>
+            </div>
+            <div class="payment-option">
+                <img src="static/images/visa.png" alt="Visa Logo">
+                <a href="#">Paiement par Carte Visa</a>
+            </div>
+            <div class="payment-option">
+                <img src="static/images/master_carte.png" alt="MasterCard Logo">
+                <a href="#">Paiement par MasterCard</a>
+            </div>
+        </main>
+    </div>
+    
+            <section class="instructions mt-5">
+                <h3 class="text-center">Instructions :</h3>
+                <ul class="mt-3">
+                    <li>Assurez-vous que les informations saisies sont correctes avant de confirmer le paiement.</li>
+                    <li>Une fois le paiement effectué, vous recevrez un email de confirmation.</li>
+                    <li>En cas de problème, contactez notre service client à l'adresse : <a href="mailto:support@salford-msnlm.com">support@salford-msnlm.com</a>.</li>
+                </ul>
+            </section>
+        </main>
+{% endblock %}

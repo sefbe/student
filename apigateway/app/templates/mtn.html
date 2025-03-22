@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MTN Mobile Money</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles_payement_mtn.css') }}">
+</head>
+<body>
+    <div class="form-container">
+        <img src="{{ url_for('static', filename='images/logo_mtn.png') }}" alt="MTN Logo" width="100">
+        <h1>MTN Mobile Money (MoMo)</h1>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <div class="messages">
+            {% for category, message in messages %}
+            <p class="flash-{{ category }}">{{ message }}</p>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% endwith %}
+        <form method="POST" action="{{ url_for('app_bp.mtn', room_id=room_id) }}">
+            <div class="form-group">
+                <label for="montant">Montant à envoyer (CFA)</label>
+                <input type="number" id="montant" name="montant" placeholder="Entrez le montant" required>
+            </div>
+
+            <div class="form-group">
+                <label for="momo-number">Numéro MoMo</label>
+                <input type="text" id="momo-number" name="momo-number" placeholder="Entrez le numéro MoMo" required>
+            </div>
+
+            <button type="submit">Envoyer</button>
+        </form>
+
+        <p>Envoyer de l'argent via MoMo</p>
+        <p>- Composez *126# pour plus d'informations</p>
+    </div>
+</body>
+</html>
+

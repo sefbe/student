@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+
+{% block title %}Mes Chambres{% endblock %}
+
+{% block content %}
+<h1>Mes Chambres</h1>
+
+<div class="row mb-2">
+  {% for room in rooms %}
+    <div class="col-md-6">
+      <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative">
+        <div class="col p-4 d-flex flex-column position-static">
+          <h3 class="mb-0">{{ room.title }}</h3>
+          <strong class="d-inline-block mb-2 text-primary-emphasis">Description: {{ room.description }}</strong>
+          <div class="mb-1 text-body-secondary">{{ room.location }}</div>
+          <p class="card-text mb-auto">
+            <li>Distance : {{ room.distance }} km</li>
+            <li>Statut : {{ room.status }}</li>
+            <h4>Prix : {{ room.price }} FCFA / mois</h4>
+          </p>
+        </div>
+        <div class="col-auto d-none d-lg-block position-relative">
+          {% if room.images and room.images[0] %}
+            <img src="data:image/jpeg;base64,{{ room.images[0]['data'] }}" alt="Image de {{ room.title }}" class="bd-placeholder-img img-fluid" style="width: 200px; height: 250px; object-fit: cover;">
+          {% else %}
+            <img src="{{ url_for('static', filename='images/default-room.jpg') }}" alt="Image par défaut" class="bd-placeholder-img img-fluid" style="width: 200px; height: 250px; object-fit: cover;">
+          {% endif %}
+          <div class="position-absolute top-50 start-50 translate-middle text-white fw-bold bg-dark bg-opacity-50 px-2 py-1 rounded">Bon prix !!!</div>
+        </div>
+        <div class="d-flex justify-content-between p-3">
+          <!-- Bouton Supprimer -->
+          <form action="{{ url_for('app_bp.delete_room', room_id=room.id) }}" method="post" style="display:inline;">
+            <button type="submit" class="btn btn-danger btn-sm">Supprimer</button>
+          </form>
+
+          <!-- Bouton Chambre Libérée -->
+          <form action="{{ url_for('app_bp.updateRoom', room_id=room.id) }}" method="post" style="display:inline;">
+            <button type="submit" class="btn btn-warning btn-sm">Chambre Libérée</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  {% endfor %}
+</div>
+{% endblock %}
+

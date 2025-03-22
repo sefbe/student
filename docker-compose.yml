@@ -1,0 +1,80 @@
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: mysql-container
+    environment:
+      MYSQL_ROOT_PASSWORD: '311937Sefa@'
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    command: >
+      --default-authentication-plugin=caching_sha2_password
+  apigateway:
+    build:
+      context: ./apigateway  # Chemin vers le répertoire contenant le Dockerfile de l'API Gateway
+    container_name: apigateway
+    ports:
+      - "5000:5000"
+    depends_on:
+      - user_service
+      - room_service
+      - reservation_service
+      - payment_service
+    environment:
+      # Ajoute ici toute variable d'environnement nécessaire pour ton API Gateway
+      API_URL: "http://apigateway:5000"
+      USER_SERVICE_URL: "http://user_service:5001"
+      ROOM_SERVICE_URL: "http://room_service:5002"
+      RESERVATION_SERVICE_URL: "http://reservation_service:5003"
+      PAYMENT_SERVICE_URL: "http://payment_service:5004"
+
+
+  user_service:
+    build:
+      context: ./user_service
+    container_name: user_service
+    ports:
+      - "5001:5001"
+    depends_on:
+      - mysql
+    environment:
+      DATABASE_URL: mysql+pymysql://sef:373040Sefa%40@mysql-container/user_service_db
+
+  room_service:
+    build:
+      context: ./room_service
+    container_name: room_service
+    ports:
+      - "5002:5002"
+    depends_on:
+      - mysql
+    environment:
+      DATABASE_URL: mysql+pymysql://sef:373040Sefa%40@mysql-container/rooms_db
+
+  reservation_service:
+    build:
+      context: ./reservation_service
+    container_name: reservation_service
+    ports:
+      - "5003:5003"
+    depends_on:
+      - mysql
+    environment:
+      DATABASE_URL: mysql+pymysql://sef:373040Sefa%40@mysql-container/reservation_db
+
+  payment_service:
+    build:
+      context: ./payment_service
+    container_name: payment_service
+    ports:
+      - "5004:5004"
+    depends_on:
+      - mysql
+    environment:
+      DATABASE_URL: mysql+pymysql://sef:373040Sefa%40@mysql-container/payment_db
+
+volumes:
+  mysql-data:
+

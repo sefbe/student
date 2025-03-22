@@ -15,52 +15,13 @@ app_bp = Blueprint('app_bp', __name__)
 
 
 # URL de base du microservice réservation
-RESERVATION_SERVICE_URL = "http://127.0.0.1:5003/reservations"
+RESERVATION_SERVICE_URL = "http://reservation_service:5003/reservations"
 # URL du microservice room_service (l'adresse peut être différente selon votre environnement Docker ou local)
-ROOM_SERVICE_URL = "http://127.0.0.1:5002"  # Adaptez l'URL en fonction de l'environnement
+ROOM_SERVICE_URL = "http://room_service:5002"  # Adaptez l'URL en fonction de l'environnement
 
-USER_SERVICE_URL = "http://127.0.0.1:5001"  # URL du microservice user_service
-##@app_bp.route('/')
-##def index():
-##    # Affiche la page d'accueil
-##    return render_template('index.html')
+USER_SERVICE_URL = "http://user_service:5001"  # URL du microservice user_service
 
-##@app_bp.route('/')
-##def index():
-##    rooms = []
-##    show_add_room_button = False
-##
-##    # Récupération des chambres depuis le room_service
-##    try:
-##        response = requests.get(f"{ROOM_SERVICE_URL}/api/rooms/random")
-##        if response.status_code == 200:
-##            rooms = response.json()
-##    except requests.RequestException:
-##        flash("Erreur de connexion au service des chambres.", "danger")
-##
-##    # Récupérer le token depuis les en-têtes de la requête
-##    token = request.headers.get("Authorization")
-##    print(f"le token est: {token}")
-##
-##    if not token:
-##        try:
-##            user_status_response = requests.get(
-##                f"{USER_SERVICE_URL}/api/users/status",
-##                headers={"Authorization": token}
-##            )
-##            if user_status_response.status_code == 200:
-##                user_data = user_status_response.json()
-##                show_add_room_button = user_data.get('status') == 'propriétaire'
-##            else:
-##                flash("Erreur lors de la récupération du statut utilisateur.", "danger")
-##        except requests.RequestException:
-##            flash("Erreur de connexion au service utilisateur.", "danger")
-##
-##    return render_template('index.html', rooms=rooms, show_add_room_button=show_add_room_button)
-
-# Route pour afficher les chambres aléatoires sur la page d'accueil
-
-
+PAYMENT_SERVICE_URL = "http://payment_service:5003"
 
 
 
@@ -93,6 +54,31 @@ def room_details(room_id):
         flash("Chambre non trouvée", "danger")
         return redirect(url_for('app_bp.index'))
     return render_template('room_details.html', room=room)
+
+
+
+@app_bp.route('/my_rooms', methods=['GET'])
+def my_rooms():
+    try:
+        # Récupérer toutes les chambres depuis le service Room
+        response = requests.get(f"{ROOM_SERVICE_URL}/api/rooms/all")
+        if response.status_code != 200:
+            flash("Erreur lors de la récupération des chambres.", "error")
+            return redirect(url_for('app_bp.index'))
+
+        rooms = response.json()
+
+        # Filtrer les chambres de l'utilisateur courant
+        current_user_id = current_user.id
+        print(f"voici son id {current_user_id}")
+        user_rooms = [room for room in rooms if room['owner_id'] == current_user_id]
+
+        return render_template('chambres.html', rooms=user_rooms)
+
+    except Exception as e:
+        flash(f"Erreur interne : {str(e)}", "error")
+        return redirect(url_for('app_bp.index'))
+
 
 
 # Route pour ajouter une chambre (seulement pour les propriétaires)
@@ -168,11 +154,11 @@ def signup():
             "last_name": form.last_name.data,
             "status": form.status.data
         }
-        response = forward_request("http://127.0.0.1:5001", "/api/users/signup", method="POST", data=data)
+        response = forward_request(f"{USER_SERVICE_URL}", "/api/users/signup", method="POST", data=data)
 
         if response and response.status_code == 201:
             flash('Compte créé avec succès !', 'success')
-            return redirect(url_for('.login'))
+            return redirect(url_for('app_bp.login'))
         else:
             flash('Erreur lors de la création du compte.', 'danger')
     return render_template('register.html', form=form)
@@ -187,7 +173,7 @@ def login():
             "email": form.email.data,
             "password": form.password.data
         }
-        response = forward_request("http://127.0.0.1:5001", "/api/users/login", method="POST", data=data)
+        response = forward_request(f"{USER_SERVICE_URL}", "/api/users/login", method="POST", data=data)
         
         if response and response.status_code == 200:
             token = response.json().get("token")
@@ -212,35 +198,35 @@ def login():
 @app_bp.route('/logout')
 def logout():
     logout_user()
-    try:
-        # Forward the request to the user_service for logout
-        response = forward_request("http://user_service:5001", "/api/users/logout", method="POST")
-        
-        if response and response.status_code == 200:
-            # Log out the user from Flask-Login
-            logout_user()
-            flash('Déconnexion réussie.', 'info')
-        else:
-            flash("Erreur lors de la déconnexion. Veuillez réessayer.", "danger")
-    except Exception as e:
-        # Handle any unexpected errors
-        flash(f"Erreur de connexion au service utilisateur : {str(e)}", "danger")
+##    try:
+##        # Forward the request to the user_service for logout
+##        response = forward_request("http://user_service:5001", "/api/users/logout", method="POST")
+##        
+##        if response and response.status_code == 200:
+##            # Log out the user from Flask-Login
+##            logout_user()
+##            flash('Déconnexion réussie.', 'info')
+##        else:
+##            flash("Erreur lors de la déconnexion. Veuillez réessayer.", "danger")
+##    except Exception as e:
+##        # Handle any unexpected errors
+##        flash(f"Erreur de connexion au service utilisateur : {str(e)}", "danger")
     
     # Redirect the user to the index page
-    return redirect(url_for('.index'))
+    return redirect(url_for('app_bp.index'))
 # 1. Fonction pour réserver une chambre
 @app_bp.route('/reserve/<int:room_id>', methods=['GET', 'POST'])
 def reserve_room(room_id):
     user_id = current_user.id # Utilisateur connecté (hypothèse)
     if not user_id:
         flash("User ID is required to reserve a room.", "error")
-        return redirect(url_for('.index'))
+        return redirect(url_for('app_bp.index'))
 
     # Changer le statut de la chambre à "réservée"
     room_response = requests.put(f"{ROOM_SERVICE_URL}/api/rooms/update_status/{room_id}", json={"status": "réservée"})
     if room_response.status_code != 200:
         flash("Failed to reserve the room.", "error")
-        return redirect(url_for('.index'))
+        return redirect(url_for('app_pb.index'))
 
     # Ajouter la réservation dans le service réservation
     reservation_response = requests.post(f"{RESERVATION_SERVICE_URL}/add", json={"user_id": user_id, "room_id": room_id})
@@ -249,7 +235,7 @@ def reserve_room(room_id):
     else:
         flash("Failed to create reservation.", "error")
 
-    return redirect(url_for('.index'))
+    return redirect(url_for('app_bp.index'))
 
 # 2. Fonction pour annuler une réservation
 @app_bp.route('/cancel/<int:reservation_id>', methods=['POST'])
@@ -258,7 +244,7 @@ def cancel(reservation_id):
     reservation_response = requests.get(f"{RESERVATION_SERVICE_URL}/get/{reservation_id}")
     if reservation_response.status_code != 200:
         flash("Reservation not found.", "error")
-        return redirect(url_for('.index'))
+        return redirect(url_for('app_bp.index'))
 
     reservation = reservation_response.json()
     room_id = reservation['room_id']
@@ -267,7 +253,7 @@ def cancel(reservation_id):
     room_response = requests.put(f"{ROOM_SERVICE_URL}/api/rooms/update_status/{room_id}", json={"status": "disponible"})
     if room_response.status_code != 200:
         flash("Failed to update room status.", "error")
-        return redirect(url_for('.index'))
+        return redirect(url_for('app_bp.index'))
 
     # Supprimer la réservation dans le service réservation
     delete_response = requests.delete(f"{RESERVATION_SERVICE_URL}/delete/{reservation_id}")
@@ -276,7 +262,7 @@ def cancel(reservation_id):
     else:
         flash("Failed to cancel reservation.", "error")
 
-    return redirect(url_for('.index'))
+    return redirect(url_for('app_bp.index'))
 
 # 3. Fonction pour vérifier et supprimer les réservations expirées (plus de 72 heures)
 @app_bp.route('/clean_expired', methods=['POST'])
@@ -285,7 +271,7 @@ def clean_expired_reservations():
     response = requests.get(f"{RESERVATION_SERVICE_URL}/all")
     if response.status_code != 200:
         flash("Failed to fetch reservations.", "error")
-        return redirect(url_for('.index'))
+        return redirect(url_for('app_bp.index'))
 
     reservations = response.json()
     now = datetime.utcnow()
@@ -301,7 +287,7 @@ def clean_expired_reservations():
                 requests.put(f"{ROOM_SERVICE_URL}/api/rooms/update_status/{room_id}", json={"status": "disponible"})
 
     flash("Expired reservations cleaned successfully.", "success")
-    return redirect(url_for('.index'))
+    return redirect(url_for('app_bp.index'))
 
 @app_bp.route('/my_reservations', methods=['GET'])
 def my_reservations():
@@ -325,7 +311,7 @@ def my_reservations():
     except requests.exceptions.RequestException as e:
         # Gestion des erreurs d'appel au service de réservation
         flash(f"Erreur lors de la récupération des réservations : {e}", "danger")
-        return redirect(url_for('.index'))
+        return redirect(url_for('app_bp.index'))
 
 
 # 4. Fonction pour rappeler à un utilisateur sa réservation
@@ -335,7 +321,7 @@ def check_user_reservation(user_id):
     response = requests.get(f"{RESERVATION_SERVICE_URL}/all")
     if response.status_code != 200:
         flash("Failed to fetch reservations.", "error")
-        return redirect(url_for('.index'))
+        return redirect(url_for('app_bp.index'))
 
     reservations = response.json()
     now = datetime.utcnow()
@@ -349,7 +335,7 @@ def check_user_reservation(user_id):
             else:
                 flash("Your reservation has expired.", "warning")
 
-    return redirect(url_for('.index'))
+    return redirect(url_for('app_bp.index'))
 
 @app_bp.route('/contact')
 def contact():
@@ -359,18 +345,136 @@ def contact():
 def about():
     return render_template('about.html')
 
+@app_bp.route('/updateRoom/<int:room_id>', methods=['POST', 'GET'])
+def updateRoom(room_id):
+    try:
+        # Effectuer la requête PUT pour mettre à jour le statut de la chambre
+        room_response = requests.put(
+            f"{ROOM_SERVICE_URL}/api/rooms/update_status/{room_id}",
+            json={"status": "disponible"}
+        )
 
-@app_bp.route('/pay/<int:room_id>')
-def pay_room():
-    pass
+        # Vérifier si la mise à jour a été réussie
+        if room_response.status_code == 200:
+            flash("Le statut de la chambre a été mis à jour avec succès.", "success")
+        else:
+            flash(f"Erreur lors de la mise à jour de la chambre : {room_response.text}", "error")
+
+    except requests.exceptions.RequestException as e:
+        flash(f"Erreur lors de la requête vers le service de chambres : {str(e)}", "error")
+
+    # Rediriger l'utilisateur vers la page appropriée, ici la liste des chambres
+    return redirect(url_for('app_bp.my_rooms'))
+
+
+@app_bp.route('/add_payment/<int:room_id>', methods=['GET', 'POST'])
+def add_payment(room_id):
+    if request.method == 'POST':
+        # Récupérer l'ID utilisateur depuis le formulaire
+        user_id = current_user.id
+
+        if not user_id:
+            flash("L'ID utilisateur est requis pour effectuer un paiement.", "danger")
+            return redirect(url_for('app_bp.add_payment', room_id=room_id))
+
+        # Préparer les données de paiement
+        payment_data = {
+            "user_id": user_id,
+            "room_id": room_id
+        }
+
+        try:
+            # Envoyer la requête POST au service de paiement
+            payment_response = requests.post(f"{PAYMENT_SERVICE_URL}/payments", json=payment_data)
+            
+            if payment_response.status_code == 201:
+                flash("Paiement ajouté avec succès.", "success")
+                return render_template('choix.html')  # Charger la page choix.html
+            else:
+                flash("Erreur lors de l'ajout du paiement.", "danger")
+        except requests.exceptions.RequestException as e:
+            flash(f"Erreur de connexion au service de paiement : {str(e)}", "danger")
+
+    # Si méthode GET ou en cas d'erreur, afficher le formulaire
+    return render_template('choix.html', room_id=room_id)
+
+
+@app_bp.route('/mtn/<int:room_id>', methods=['GET', 'POST'])
+def mtn(room_id):
+    if request.method == 'POST':
+        montant = request.form.get('montant')
+        momo_number = request.form.get('momo-number')
+
+        if not montant or not momo_number:
+            flash("Veuillez remplir tous les champs.", "danger")
+            return render_template('mtn.html', room_id=room_id)
+
+        if not montant.isdigit() or int(montant) <= 0:
+            flash("Le montant doit être un nombre positif.", "danger")
+            return render_template('mtn.html', room_id=room_id)
+
+        # Mettre à jour le statut de la chambre
+        try:
+            response = requests.put(
+                f"{ROOM_SERVICE_URL}/api/rooms/update_status/{room_id}",
+                json={"status": "louée", "montant": montant}
+            )
+            if response.status_code == 200:
+                flash("Paiement via MTN réussi, chambre louée avec succès.", "success")
+                return redirect(url_for('app_bp.index'))
+            elif response.status_code == 404:
+                flash("Chambre introuvable.", "danger")
+            else:
+                flash("Erreur lors de la mise à jour de la chambre via MTN.", "danger")
+        except requests.exceptions.RequestException as e:
+            flash(f"Erreur de connexion au service des chambres : {str(e)}", "danger")
+        
+        return render_template('mtn.html', room_id=room_id)
+
+    return render_template('mtn.html', room_id=room_id)
+
+
+@app_bp.route('/orange/<int:room_id>', methods=['GET', 'POST'])
+def orange(room_id):
+    if request.method == 'POST':
+        montant = request.form.get('montant')
+        om_number = request.form.get('om-number')
+
+        if not montant or not om_number:
+            flash("Veuillez remplir tous les champs.", "danger")
+            return render_template('orange.html', room_id=room_id)
+
+        if not montant.isdigit() or int(montant) <= 0:
+            flash("Le montant doit être un nombre positif.", "danger")
+            return render_template('orange.html', room_id=room_id)
+
+        # Mettre à jour le statut de la chambre
+        try:
+            response = requests.put(
+                f"{ROOM_SERVICE_URL}/api/rooms/update_status/{room_id}",
+                json={"status": "louée", "montant": montant}
+            )
+            if response.status_code == 200:
+                flash("Paiement via Orange Money réussi, chambre louée avec succès.", "success")
+                return redirect(url_for('app_bp.index'))
+            elif response.status_code == 404:
+                flash("Chambre introuvable.", "danger")
+            else:
+                flash("Erreur lors de la mise à jour de la chambre via Orange Money.", "danger")
+        except requests.exceptions.RequestException as e:
+            flash(f"Erreur de connexion au service des chambres : {str(e)}", "danger")
+        
+        return render_template('orange.html', room_id=room_id)
+
+    return render_template('orange.html', room_id=room_id)
+
+
 
 @app_bp.route('/informations')
 def informations():
     return render_template('informations.html')
 
-@app_bp.route('/settings')
-def settings():
-    pass
+
 
 @app_bp.route('/actualites')
 def actualites():
@@ -382,4 +486,4 @@ def services():
 
 @app_bp.route('/payment')
 def payment():
-    pass
+    return render_template('paiement.html')

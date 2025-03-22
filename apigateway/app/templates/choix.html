@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Paiement - Salford & MSNLM Sarl</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Bienvenue sur le système de paiement</h1>
+        </header>
+        <main class="payment-options">
+            <h2>Choisissez votre mode de paiement :</h2>
+            <div class="payment-option">
+                <img src="{{ url_for('static', filename='images/logo_mtn.png') }}" alt="MTN Logo" class="img-fluid">
+                <a href="{{ url_for('app_bp.mtn', room_id=room_id) }}">MTN Mobile Money</a>
+            </div>
+            <div class="payment-option">
+                <img src="{{ url_for('static', filename='images/logo_orange.png') }}" alt="Orange Logo" class="img-fluid">
+                <a href="{{ url_for('app_bp.orange', room_id=room_id) }}" class="btn btn-primary">Orange Money</a>
+            </div>
+            <div class="payment-option">
+                <img src="{{ url_for('static', filename='images/visa.png') }}" alt="Visa Logo" class="img-fluid">
+                <a href="#">Paiement par Carte Visa</a>
+            </div>
+            <div class="payment-option">
+                <img src="{{ url_for('static', filename='images/master_carte.png') }}" alt="MasterCard Logo" class="img-fluid">
+                <a href="#">Paiement par MasterCard</a>
+            </div>
+        </main>
+
+        <section class="instructions">
+            <h3>Instructions :</h3>
+            <ul>
+                <li>Assurez-vous que les informations saisies sont correctes avant de confirmer le paiement.</li>
+                <li>Une fois le paiement effectué, vous recevrez un email de confirmation.</li>
+                <li>En cas de problème, contactez notre service client à l'adresse : <a href="mailto:support@salford-msnlm.com">support@salford-msnlm.com</a>.</li>
+            </ul>
+        </section>
+
+        <footer>
+            <p>&copy; 2024 Salford & MSNLM Sarl. Tous droits réservés.</p>
+            <div class="bouton back">
+                <p><a href="#">Retour à l'accueil</a></p>
+            </div>
+        </footer>
+    </div>
+</body>
+</html>

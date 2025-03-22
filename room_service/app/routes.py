@@ -13,7 +13,7 @@ def get_random_rooms():
     if not rooms:
         return jsonify([]), 200
 
-    random_rooms = random.sample(rooms, min(len(rooms), 3))
+    random_rooms = random.sample(rooms, min(len(rooms), 4))
     result = []
     for room in random_rooms:
         room_data = room.to_dict()
@@ -109,3 +109,26 @@ def update_status(room_id):
     db.session.commit()
 
     return jsonify({'message': 'Room status updated successfully', 'room_id': room_id, 'new_status': new_status}), 200
+
+@room_bp.route('/all', methods=['GET'])
+def get_all_rooms():
+    try:
+        # Récupérer toutes les chambres de la base de données
+        rooms = Room.query.all()
+
+        # Convertir les chambres en un format JSON
+        rooms_list = []
+        for room in rooms:
+            room_data = room.to_dict()
+            # Encoder les images associées
+            images = [
+                {"name": image.image_name, "data": base64.b64encode(image.image_data).decode('utf-8')}
+                for image in room.images
+            ]
+            room_data['images'] = images
+            rooms_list.append(room_data)
+
+        return jsonify(rooms_list), 200
+    except Exception as e:
+        print(f"Erreur lors de la récupération des chambres : {str(e)}")
+        return jsonify({"message": "Erreur interne du serveur"}), 500

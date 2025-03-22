@@ -3,39 +3,42 @@
 {% block title %}Mes Réservations{% endblock %}
 
 {% block content %}
-    <h1>Mes Réservations</h1>
+    <h1 class="my-4 text-center">Mes Réservations</h1>
 
     {% if reservations %}
-        <table>
-            <thead>
-                <tr>
-                    <th>#</th>
-                    <th>Chambre</th>
-                    <th>Date de réservation</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for reservation in reservations %}
+        <div class="table-responsive">
+            <table class="table table-striped table-bordered align-middle">
+                <thead class="table-dark text-center">
                     <tr>
-                        <td>{{ loop.index }}</td>
-                        <td>{{ reservation.room_id }}</td>
-                        <td>{{ reservation.reservation_date }}</td>
-                        <td>
-                            <form action="{{ url_for('app_bp.pay_room', room_id=reservation.id) }}" method="post" style="display:inline;">
-                                <button type="submit" class="btn btn-success">Payer</button>
-                            </form>
-                            <form action="{{ url_for('app_bp.cancel', reservation_id=reservation.id) }}" method="post" style="display:inline;">
-                                <button type="submit" class="btn btn-danger">Annuler</button>
-                            </form>
-                        </td>
+                        <th scope="col">#</th>
+                        <th scope="col">Chambre</th>
+                        <th scope="col">Date de Réservation</th>
+                        <th scope="col">Actions</th>
                     </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    {% for reservation in reservations %}
+                        <tr>
+                            <td class="text-center">{{ loop.index }}</td>
+                            <td class="text-center">{{ reservation.room_id }}</td>
+                            <td class="text-center">{{ reservation.reservation_date }}</td>
+                            <td class="text-center">
+                                <form action="{{ url_for('app_bp.add_payment', room_id=reservation.id) }}" method="post" class="d-inline">
+                                    <button type="submit" class="btn btn-success btn-sm">Payer</button>
+                                </form>
+                                <form action="{{ url_for('app_bp.cancel', reservation_id=reservation.id) }}" method="post" class="d-inline">
+                                    <button type="submit" class="btn btn-danger btn-sm">Annuler</button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
     {% else %}
-        <p>Vous n'avez aucune réservation.</p>
+        <div class="alert alert-info text-center" role="alert">
+            Vous n'avez aucune réservation pour le moment.
+        </div>
     {% endif %}
 {% endblock %}
-
 

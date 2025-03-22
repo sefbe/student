@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Orange Money</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles_payement_om.css') }}">
+</head>
+<body>
+    <div class="form-container">
+        <img src="{{ url_for('static', filename='images/logo_orange.png') }}" alt="Orange Money Logo" width="100">
+        <h1>Orange Money (OM)</h1>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <div class="messages">
+            {% for category, message in messages %}
+            <p class="flash-{{ category }}">{{ message }}</p>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% endwith %}
+        <form method="POST" action="{{ url_for('app_bp.orange', room_id=room_id) }}">
+            <div class="form-group">
+                <label for="montant">Montant à envoyer (CFA)</label>
+                <input type="number" id="montant" name="montant" placeholder="Entrez le montant" required>
+            </div>
+
+            <div class="form-group">
+                <label for="om-number">Numéro Orange Money</label>
+                <input type="text" id="om-number" name="om-number" placeholder="Entrez le numéro Orange Money" required>
+            </div>
+
+            <button type="submit">Envoyer</button>
+        </form>
+
+        <p>Envoyer de l'argent via Orange Money</p>
+        <p>- Composez #150# pour plus d'informations</p>
+    </div>
+</body>
+
+</html>

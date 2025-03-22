@@ -10,7 +10,6 @@
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
-    <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
   </head>
   <body>
     <div class="container">
@@ -49,7 +48,7 @@
           <a class="nav-item nav-link link-body-emphasis" href="{{ url_for('app_bp.my_reservations') }}">Mes Reservations</a>
           {% if current_user.is_authenticated and show_add_room_button %}
             <a class="nav-item nav-link link-body-emphasis" href="{{ url_for('app_bp.add_room') }}">Ajouter une Chambre</a>
-            <a class="nav-item nav-link link-body-emphasis" href="{{ url_for('app_bp.add_room') }}">Mes Chambres</a>
+            <a class="nav-item nav-link link-body-emphasis" href="{{ url_for('app_bp.my_rooms') }}">Mes Chambres</a>
           {% endif %}
           <a class="nav-item nav-link link-body-emphasis" href="{{ url_for('app_bp.contact') }}">Contacter Nous</a>
         </nav>
@@ -76,4 +75,75 @@
     <main class="container">
       {% block content %}
       {% endblock %}
+      <div class="row g-5">
+        <div class="col-md-8">
+          <!-- Section: Informations -->
+          <h3 class="pb-4 mb-4 fst-italic border-bottom">
+            Informations
+          </h3>
+          <article class="blog-post">
+            <h2 class="display-5 link-body-emphasis mb-1">Suivre les instructions</h2>
+            <h4>Comment réserver une chambre ?</h4>
+            <p class="lead my-3">Connectez-vous, explorez nos options, et cliquez sur "Réserver".</p>
+            <h4>Quels sont les moyens de paiement acceptés ?</h4>
+            <p class="lead mb-0">
+              <a href="{{ url_for('app_bp.informations') }}" class="text-body-emphasis fw-bold">Continue reading...</a>
+            </p>
+          </article>
+        </div>
+      </div>
+
+      <div class="row g-5">
+        <div class="col-md-8">
+          <!-- Section: Nos Services -->
+          <h3 class="pb-4 mb-4 fst-italic border-bottom">
+            Nos Services
+          </h3>
+          <article class="blog-post">
+            <h2>Options de logement</h2>
+            <ul>
+              <li>Chambres meublées</li>
+              <li>Studios étudiants</li>
+              <li>Appartements partagés</li>
+            </ul>
+            <p class="lead mb-0">
+              <a href="{{ url_for('app_bp.services') }}" class="text-body-emphasis fw-bold">Continue reading...</a>
+            </p>
+          </article>
+        </div>
+      </div>
+
+      <div class="row g-5">
+        <div class="col-md-8">
+          <!-- Section: Contactez-nous -->
+          <h3 class="pb-4 mb-4 fst-italic border-bottom">
+            Contactez-nous
+          </h3>
+          <article class="blog-post">
+            <h2 class="display-5 link-body-emphasis mb-1">Nous sommes là pour vous aider</h2>
+            <p class="lead my-3">
+              Pour toute question ou assistance, n'hésitez pas à nous contacter. Nos équipes se feront un plaisir de vous répondre dans les plus brefs délais.
+            </p>
+            <h4>Nos coordonnées :</h4>
+            <ul>
+              <li><strong>Adresse :</strong> 123 Rue cité Universitaire, Ngoa Ekele, Cameroun</li>
+              <li><strong>Téléphone :</strong> +237 681 43 49 03</li>
+              <li><strong>Email :</strong> contact@notresite.com</li>
+            </ul>
+            <h4>Formulaire de contact :</h4>
+        
+          </article>
+        </div>
+      </div>
+    </main>
+
+    <footer class="py-5 text-center text-body-secondary bg-body-tertiary">
+      <p>&copy; 2024 Salford & MSNLM Sarl. Tous droits réservés.</p>
+      <p>Plus d'informations Email: <a href="paolocisse6@gmail.com">Email MSNLM</a> Telephone: <a href="+237 681434903">+237 681434903</a>.</p>
+      <p class="mb-0">
+        <a href="#">Back to top</a>
+      </p>
+    </footer>
+  </body>
+</html>
 
